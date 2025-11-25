@@ -55,23 +55,23 @@ To build the docker image for runpod, you can run the following command:
 
 ```bash
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
-docker build -f runpod/johnh_dev.Dockerfile -t jplhughes1/runpod-dev .
+docker build -f runpod/liangq_dev.Dockerfile -t liangq/runpod-dev .
 
 # Build with buildx
 docker buildx create --name mybuilder --use
-docker buildx build --platform linux/amd64 -f runpod/johnh_dev.Dockerfile -t jplhughes1/runpod-dev . --push
+docker buildx build --platform linux/amd64 -f runpod/liangq_dev.Dockerfile -t liangq/runpod-dev . --push
 
 ```
 
 To test it
 
 ```bash
-docker run -it -v $PWD/runpod/entrypoint.sh:/dotfiles/runpod/entrypoint.sh -e USE_ZSH=true jplhughes1/runpod-dev /bin/zsh
+docker run -it -v $PWD/runpod/entrypoint.sh:/dotfiles/runpod/entrypoint.sh -e USE_ZSH=true liangq/runpod-dev /bin/zsh
 ```
 
 To push it to docker hub
 
 ```bash
-docker push jplhughes1/runpod-dev
+docker push liangq/runpod-dev
 ```
 

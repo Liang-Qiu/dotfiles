@@ -64,7 +64,7 @@
     "python.analysis.autoImportCompletions": true,
     "editor.accessibilitySupport": "off",
     "remote.SSH.enableRemoteCommand": true,
-    "remote.SSH.path": "/Users/johnh/ssh_singularity",
+    "remote.SSH.path": "/Users/liangq/ssh_singularity",
     "files.exclude": {
         "**/.cache": true,
         "**/.DS_Store": true,
