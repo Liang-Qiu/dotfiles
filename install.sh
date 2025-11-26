@@ -71,25 +71,26 @@ if [ $machine == "Linux" ]; then
 
 # Installing on mac with homebrew
 elif [ $machine == "Mac" ]; then
-    yes | brew install coreutils ncdu htop ncdu rsync btop jq  # Mac won't have realpath before coreutils installed
+    brew install coreutils ncdu htop ncdu rsync btop jq || true  # Mac won't have realpath before coreutils installed
     curl -LsSf https://astral.sh/uv/install.sh | sh
 
     if [ $extras == true ]; then
-        yes | brew install ripgrep dust jless
+        brew install ripgrep dust jless || true
 
-        yes | curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
         . "$HOME/.cargo/env" 
-        yes | cargo install code2prompt
-        yes | brew install peco
+        cargo install code2prompt || true
+        brew install peco || true
     fi
 
     DOT_DIR=$(dirname $(realpath $0))
-    [ $zsh == true ] && yes | brew install zsh
-    [ $tmux == true ] && yes | brew install tmux
-    defaults write -g InitialKeyRepeat -int 10 # normal minimum is 15 (225 ms)
-    defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
-    defaults write -g com.apple.mouse.scaling 5.0
-    defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
+    [ $zsh == true ] && brew install zsh || true
+    [ $tmux == true ] && brew install tmux || true
+    # macOS system preferences removed - user preference
+    # defaults write -g InitialKeyRepeat -int 10 # normal minimum is 15 (225 ms)
+    # defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
+    # defaults write -g com.apple.mouse.scaling 5.0
+    # defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 fi
 
 # Setting up oh my zsh and oh my zsh plugins

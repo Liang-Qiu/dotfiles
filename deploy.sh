@@ -31,7 +31,11 @@ while (( "$#" )); do
 done
 
 echo "deploying on machine..."
-echo "using extra aliases: ${ALIASES[@]}"
+if [ -n "${ALIASES+x}" ] && [ ${#ALIASES[@]} -gt 0 ]; then
+    echo "using extra aliases: ${ALIASES[@]}"
+else
+    echo "using extra aliases: none"
+fi
 
 # Tmux setup
 echo "source $DOT_DIR/config/tmux.conf" > $HOME/.tmux.conf

@@ -20,9 +20,10 @@ source $CONFIG_DIR/extras.sh
 source $CONFIG_DIR/key_bindings.sh
 add_to_path "${DOT_DIR}/custom_bins"
 
-# for uv
+# for uv - add to PATH and source env if it exists
 if [ -d "$HOME/.local/bin" ]; then
-  source $HOME/.local/bin/env
+  export PATH="$HOME/.local/bin:$PATH"
+  [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
