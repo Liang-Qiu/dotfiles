@@ -14,13 +14,12 @@ uv pip install ipykernel simple-gpu-scheduler # very useful on runpod with multi
 python -m ipykernel install --user --name=venv # so it shows up in jupyter notebooks within vscode
 
 # 3) Setup dotfiles and ZSH
-mkdir git && cd git
+cd /workspace
 git clone https://github.com/Liang-Qiu/dotfiles.git
 cd dotfiles
 ./install.sh --zsh --tmux
 chsh -s /usr/bin/zsh
 ./deploy.sh
-cd ..
 
 # 4) Setup github
 echo ./scripts/setup_github.sh "liangqiu@outlook.com" "Liang-Qiu"
