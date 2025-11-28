@@ -31,7 +31,12 @@ alias which='type -a'
 
 # storage
 alias du='du -kh' # file space
-alias df='df -kTh' # disk space
+# df: Linux uses -T for filesystem type, macOS doesn't support it
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    alias df='df -kTh' # disk space
+else
+    alias df='df -kh' # disk space (macOS compatible)
+fi
 alias usage='du -sh * 2>/dev/null | sort -rh'
 alias dus='du -sckx * | sort -nr'
 
