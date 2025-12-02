@@ -53,7 +53,13 @@ if [ $machine == "Linux" ]; then
     [ $tmux == true ] && sudo apt-get install -y tmux
     sudo apt-get install -y less nano htop ncdu nvtop lsof rsync jq
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    
+    # Install Claude Code if not already installed
+    if [ -x ~/.local/bin/claude ] || [ -d ~/.local/share/claude ]; then
+        echo "Claude Code is already installed, skipping..."
+    else
+        curl -fsSL https://claude.ai/install.sh | bash
+    fi
+
     if [ $extras == true ]; then
         sudo apt-get install -y ripgrep
 
@@ -73,12 +79,18 @@ if [ $machine == "Linux" ]; then
 elif [ $machine == "Mac" ]; then
     brew install coreutils ncdu htop ncdu rsync btop jq || true  # Mac won't have realpath before coreutils installed
     curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Install Claude Code if not already installed
+    if [ -x ~/.local/bin/claude ] || [ -d ~/.local/share/claude ]; then
+        echo "Claude Code is already installed, skipping..."
+    else
+        curl -fsSL https://claude.ai/install.sh | bash
+    fi
 
     if [ $extras == true ]; then
         brew install ripgrep dust jless || true
 
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-        . "$HOME/.cargo/env" 
+        . "$HOME/.cargo/env"
         cargo install code2prompt || true
         brew install peco || true
     fi
