@@ -61,4 +61,7 @@ if command -v ask-sh &> /dev/null; then
   eval "$(ask-sh --init)"
 fi
 
+# Source credentials if available (for runpod)
+[ -f /workspace/cred.sh ] && source /workspace/cred.sh
+
 cat $CONFIG_DIR/start.txt

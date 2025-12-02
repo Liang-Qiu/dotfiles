@@ -17,9 +17,6 @@ if [ "$(getent passwd ubuntu-cmd | cut -d: -f7)" != "/bin/zsh" ] && [ -x /bin/zs
     echo "Changed ubuntu-cmd shell to zsh"
 fi
 
-# Create .zshrc if it doesn't exist
-su - ubuntu-cmd -c '[ -f ~/.zshrc ] || touch ~/.zshrc' 2>/dev/null || true
-
 echo "=== Granting access to /workspace ==="
 # Add ubuntu-cmd to workspace group or use ACLs
 if command -v setfacl &>/dev/null; then
@@ -44,20 +41,17 @@ else
 fi
 
 echo "=== Configuring shell for ubuntu-cmd ==="
-# Add ~/.local/bin to PATH
+# Add ~/.local/bin to PATH and cred.sh sourcing
+# Note: .zshrc may be overwritten by deploy.sh, so use .zprofile for zsh login shells
 PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
-# Add to bash configs
-su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.bashrc 2>/dev/null || echo '$PATH_LINE' >> ~/.bashrc"
-su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.bash_profile 2>/dev/null || echo '$PATH_LINE' >> ~/.bash_profile" || true
-# Add to zsh configs (both .zshrc for interactive and .zprofile for login shells)
-su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.zshrc 2>/dev/null || echo '$PATH_LINE' >> ~/.zshrc"
-su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.zprofile 2>/dev/null || echo '$PATH_LINE' >> ~/.zprofile"
-
-# Add cred.sh sourcing
 CRED_LINE='[ -f /workspace/cred.sh ] && source /workspace/cred.sh'
+
+# Bash config
+su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.bashrc 2>/dev/null || echo '$PATH_LINE' >> ~/.bashrc"
 su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.bashrc 2>/dev/null || echo '$CRED_LINE' >> ~/.bashrc"
-su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.bash_profile 2>/dev/null || echo '$CRED_LINE' >> ~/.bash_profile" || true
-su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.zshrc 2>/dev/null || echo '$CRED_LINE' >> ~/.zshrc"
+
+# Zsh config (.zprofile for login shells - survives deploy.sh overwriting .zshrc)
+su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.zprofile 2>/dev/null || echo '$PATH_LINE' >> ~/.zprofile"
 su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.zprofile 2>/dev/null || echo '$CRED_LINE' >> ~/.zprofile"
 echo "Added PATH and credential sourcing to ubuntu-cmd's shell configs"
 

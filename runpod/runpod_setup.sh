@@ -16,18 +16,10 @@ source .venv/bin/activate
 uv pip install ipykernel simple-gpu-scheduler # very useful on runpod with multi-GPUs https://pypi.org/project/simple-gpu-scheduler/
 python -m ipykernel install --user --name=venv # so it shows up in jupyter notebooks within vscode
 
-# 3) Setup dotfiles and ZSH
-cd /workspace
-git clone https://github.com/Liang-Qiu/dotfiles.git
-cd dotfiles
-./install.sh --zsh --tmux
-chsh -s /usr/bin/zsh
-./deploy.sh
-
-# 4) Setup github
+# 3) Setup github
 echo ./scripts/setup_github.sh "liangqiu@outlook.com" "Liang-Qiu"
 
-# 5) Install Claude Code for root
+# 4) Install Claude Code for root
 echo "=== Installing Claude Code for root ==="
 if [ -x ~/.local/bin/claude ] || [ -d ~/.local/share/claude ]; then
     echo "Claude Code is already installed for root, skipping..."
@@ -35,16 +27,14 @@ else
     curl -fsSL https://claude.ai/install.sh | bash
 fi
 
-# 6) Setup ubuntu-cmd user with Claude Code
+# 5) Setup ubuntu-cmd user with Claude Code
 "${SCRIPT_DIR}/setup-ubuntu-cmd.sh"
 
-# 7) Source cred.sh in .zshrc for root and ubuntu-cmd
-CRED_LINE='[ -f /workspace/cred.sh ] && source /workspace/cred.sh'
-# Root user
-if [ -f ~/.zshrc ]; then
-    grep -qxF "$CRED_LINE" ~/.zshrc 2>/dev/null || echo "$CRED_LINE" >> ~/.zshrc
-fi
-# ubuntu-cmd user
-if [ -f /home/ubuntu-cmd/.zshrc ]; then
-    grep -qxF "$CRED_LINE" /home/ubuntu-cmd/.zshrc 2>/dev/null || echo "$CRED_LINE" >> /home/ubuntu-cmd/.zshrc
-fi
+# 6) Setup dotfiles and ZSH (last because deploy.sh starts interactive zsh)
+# Note: cred.sh is sourced from config/zshrc.sh directly
+cd /workspace
+git clone https://github.com/Liang-Qiu/dotfiles.git
+cd dotfiles
+./install.sh --zsh --tmux
+chsh -s /usr/bin/zsh
+./deploy.sh
