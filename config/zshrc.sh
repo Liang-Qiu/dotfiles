@@ -9,7 +9,14 @@ export TERM="xterm-256color"
 
 ZSH_DISABLE_COMPFIX=true
 ZSH_THEME="powerlevel10k/powerlevel10k"
-ZSH=$HOME/.oh-my-zsh
+
+# Use shared system-wide oh-my-zsh installation, fallback to user installation
+if [ -d /usr/local/share/oh-my-zsh ]; then
+    ZSH=/usr/local/share/oh-my-zsh
+    ZSH_CUSTOM=/usr/local/share/oh-my-zsh/custom
+else
+    ZSH=$HOME/.oh-my-zsh
+fi
 
 plugins=(zsh-autosuggestions zsh-syntax-highlighting zsh-completions zsh-history-substring-search)
 

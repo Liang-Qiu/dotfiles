@@ -105,34 +105,45 @@ elif [ $machine == "Mac" ]; then
     # defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 fi
 
-# Setting up oh my zsh and oh my zsh plugins
-ZSH=~/.oh-my-zsh
-ZSH_CUSTOM=$ZSH/custom
-if [ -d $ZSH ] && [ "$force" = "false" ]; then
-    echo "Skipping download of oh-my-zsh and related plugins, pass --force to force redeownload"
+# Setting up oh my zsh and plugins to SHARED system location
+# This allows multiple users to share the same installation
+ZSH_SHARED=/usr/local/share/oh-my-zsh
+ZSH_CUSTOM_SHARED=$ZSH_SHARED/custom
+TMUX_THEMEPACK_SHARED=/usr/local/share/tmux-themepack
+
+if [ -d $ZSH_SHARED ] && [ "$force" = "false" ]; then
+    echo "Skipping download of oh-my-zsh and related plugins, pass --force to force redownload"
 else
     echo " --------- INSTALLING DEPENDENCIES ⏳ ----------- "
-    rm -rf $ZSH
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+    sudo rm -rf $ZSH_SHARED
 
-    git clone https://github.com/romkatv/powerlevel10k.git \
-        ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
+    # Install oh-my-zsh to shared location
+    sudo mkdir -p $ZSH_SHARED
+    sudo git clone https://github.com/ohmyzsh/ohmyzsh.git $ZSH_SHARED
+    sudo mkdir -p $ZSH_CUSTOM_SHARED/themes $ZSH_CUSTOM_SHARED/plugins
 
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-        ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+    sudo git clone https://github.com/romkatv/powerlevel10k.git \
+        $ZSH_CUSTOM_SHARED/themes/powerlevel10k
 
-    git clone https://github.com/zsh-users/zsh-autosuggestions \
-        ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    sudo git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+        $ZSH_CUSTOM_SHARED/plugins/zsh-syntax-highlighting
 
-    git clone https://github.com/zsh-users/zsh-completions \
-        ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+    sudo git clone https://github.com/zsh-users/zsh-autosuggestions \
+        $ZSH_CUSTOM_SHARED/plugins/zsh-autosuggestions
 
-    git clone https://github.com/zsh-users/zsh-history-substring-search \
-        ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
-    git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+    sudo git clone https://github.com/zsh-users/zsh-completions \
+        $ZSH_CUSTOM_SHARED/plugins/zsh-completions
 
-    # git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    # yes | ~/.fzf/install
+    sudo git clone https://github.com/zsh-users/zsh-history-substring-search \
+        $ZSH_CUSTOM_SHARED/plugins/zsh-history-substring-search
+
+    # Install tmux-themepack to shared location
+    sudo rm -rf $TMUX_THEMEPACK_SHARED
+    sudo git clone https://github.com/jimeh/tmux-themepack.git $TMUX_THEMEPACK_SHARED
+
+    # Make shared directories readable by all users
+    sudo chmod -R a+rX $ZSH_SHARED
+    sudo chmod -R a+rX $TMUX_THEMEPACK_SHARED
 
     echo " --------- INSTALLED SUCCESSFULLY ✅ ----------- "
     echo " --------- NOW RUN ./deploy.sh [OPTION] -------- "
