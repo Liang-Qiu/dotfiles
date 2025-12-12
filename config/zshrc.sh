@@ -72,3 +72,5 @@ fi
 [ -f /workspace/cred.sh ] && source /workspace/cred.sh
 
 cat $CONFIG_DIR/start.txt
+
+export UV_CACHE_DIR=/workspace/.cache/uv
