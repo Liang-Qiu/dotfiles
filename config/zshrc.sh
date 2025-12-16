@@ -71,6 +71,4 @@ fi
 # Source credentials if available (for runpod)
 [ -f /workspace/cred.sh ] && source /workspace/cred.sh
 
-cat $CONFIG_DIR/start.txt
-
-export UV_CACHE_DIR=/workspace/.cache/uv
+# cat $CONFIG_DIR/start.txt  # Disabled ASCII art

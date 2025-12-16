@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 1) Setup linux dependencies
 su -c 'apt-get update && apt-get install -y sudo'
-sudo apt-get install -y less nano htop ncdu nvtop lsof rsync btop jq
+sudo apt-get install -y less nano vim htop ncdu nvtop lsof rsync btop jq
 
 # 2) Setup virtual environment
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -15,9 +15,10 @@ uv venv
 source .venv/bin/activate
 uv pip install ipykernel simple-gpu-scheduler # very useful on runpod with multi-GPUs https://pypi.org/project/simple-gpu-scheduler/
 python -m ipykernel install --user --name=venv # so it shows up in jupyter notebooks within vscode
+deactivate # Deactivate venv so user can activate their own environment
 
 # 3) Setup github
-echo ./scripts/setup_github.sh "liangqiu@outlook.com" "Liang-Qiu"
+"${SCRIPT_DIR}/setup_github.sh" "liangqiu@outlook.com" "Liang-Qiu"
 
 # 4) Install Claude Code for root
 echo "=== Installing Claude Code for root ==="
