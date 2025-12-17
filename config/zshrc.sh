@@ -68,7 +68,24 @@ if command -v ask-sh &> /dev/null; then
   eval "$(ask-sh --init)"
 fi
 
-# Source credentials if available (for runpod)
-[ -f /workspace/cred.sh ] && source /workspace/cred.sh
+# Skip 1Password integration on macOS
+if [[ "$(uname)" != "Darwin" && -o interactive ]]; then
+  if [[ -z "$OP_SERVICE_ACCOUNT_TOKEN" ]]; then
+    echo -n "Enter OP_SERVICE_ACCOUNT_TOKEN: " > /dev/tty
+    read -rs OP_SERVICE_ACCOUNT_TOKEN < /dev/tty
+    echo > /dev/tty
+
+    OP_SERVICE_ACCOUNT_TOKEN="${OP_SERVICE_ACCOUNT_TOKEN//[$'\x00'-$'\x1f'$'\x7f']/}"
+    OP_SERVICE_ACCOUNT_TOKEN="${OP_SERVICE_ACCOUNT_TOKEN//\[200~/}"
+    OP_SERVICE_ACCOUNT_TOKEN="${OP_SERVICE_ACCOUNT_TOKEN//\[201~/}"
+
+    export OP_SERVICE_ACCOUNT_TOKEN
+  fi
+
+  if [[ -n "$OP_SERVICE_ACCOUNT_TOKEN" && -f /workspace/.env ]]; then
+    echo "Loading /workspace/.env"
+    eval "$(op inject -i /workspace/.env)"
+  fi
+fi
 
 # cat $CONFIG_DIR/start.txt  # Disabled ASCII art
