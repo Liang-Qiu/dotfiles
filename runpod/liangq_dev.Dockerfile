@@ -1,8 +1,8 @@
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+FROM runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404
 
 # Install SSH and other dependencies
 RUN apt-get update && \
-    apt-get install -y openssh-server sudo less nano htop ncdu && \
+    apt-get install -y openssh-server sudo less vim htop ncdu && \
     mkdir /var/run/sshd
 
 # Create a directory for SSH keys
@@ -20,10 +20,10 @@ RUN mkdir dotfiles
 COPY . /dotfiles
 
 RUN cd dotfiles && \
-    ./install.sh --zsh --tmux
+    ./install.sh
 
 RUN cd dotfiles && \
-    ./deploy.sh
+    ./deploy.sh --vim
 
 RUN echo "/usr/bin/zsh" >> /etc/shells
 

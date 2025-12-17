@@ -66,19 +66,16 @@ echo "source $DOTFILES_DIR/config/zshrc.sh" > "$UBUNTU_CMD_HOME/.zshrc"
 chown ubuntu-cmd:ubuntu-cmd "$UBUNTU_CMD_HOME/.zshrc"
 
 echo "=== Configuring shell environment for ubuntu-cmd ==="
-# Add ~/.local/bin to PATH and cred.sh sourcing in .zprofile
+# Add ~/.local/bin to PATH in .zprofile
 # Note: .zprofile is used for login shells and survives .zshrc changes
 PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
-CRED_LINE='[ -f /workspace/cred.sh ] && source /workspace/cred.sh'
 
 # Bash config (fallback)
 su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.bashrc 2>/dev/null || echo '$PATH_LINE' >> ~/.bashrc"
-su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.bashrc 2>/dev/null || echo '$CRED_LINE' >> ~/.bashrc"
 
 # Zsh config (.zprofile for login shells)
 su - ubuntu-cmd -c "grep -qxF '$PATH_LINE' ~/.zprofile 2>/dev/null || echo '$PATH_LINE' >> ~/.zprofile"
-su - ubuntu-cmd -c "grep -qxF '$CRED_LINE' ~/.zprofile 2>/dev/null || echo '$CRED_LINE' >> ~/.zprofile"
-echo "Added PATH and credential sourcing to ubuntu-cmd's shell configs"
+echo "Added PATH to ubuntu-cmd's shell configs"
 
 echo "=== Setup complete ==="
 echo "ubuntu-cmd has the same setup as root (shared oh-my-zsh, uv, Claude Code, dotfiles)"

@@ -3,10 +3,9 @@ set -euo pipefail
 USAGE=$(cat <<-END
     Usage: ./install.sh [OPTION]
     Install dotfile dependencies on mac or linux
+    (tmux and zsh are always installed)
 
     OPTIONS:
-        --tmux       install tmux
-        --zsh        install zsh
         --extras     install extra dependencies
 
     If OPTIONS are passed they will be installed
@@ -14,18 +13,12 @@ USAGE=$(cat <<-END
 END
 )
 
-zsh=false
-tmux=false
 extras=false
 force=false
 while (( "$#" )); do
     case "$1" in
         -h|--help)
             echo "$USAGE" && exit 1 ;;
-        --zsh)
-            zsh=true && shift ;;
-        --tmux)
-            tmux=true && shift ;;
         --extras)
             extras=true && shift ;;
         --force)
@@ -49,15 +42,35 @@ esac
 if [ $machine == "Linux" ]; then
     DOT_DIR=$(dirname $(realpath $0))
     sudo apt-get update -y
-    [ $zsh == true ] && sudo apt-get install -y zsh
-    [ $tmux == true ] && sudo apt-get install -y tmux
-    sudo apt-get install -y less nano htop ncdu nvtop lsof rsync jq
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    sudo apt-get install -y zsh tmux less vim htop ncdu nvtop lsof rsync jq
+    # Install uv if not already installed
+    if [ -x ~/.local/bin/uv ] || command -v uv &> /dev/null; then
+        echo "uv is already installed, skipping..."
+    else
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    fi
     # Install Claude Code if not already installed
     if [ -x ~/.local/bin/claude ] || [ -d ~/.local/share/claude ]; then
         echo "Claude Code is already installed, skipping..."
     else
         curl -fsSL https://claude.ai/install.sh | bash
+    fi
+    # Install 1Password CLI if not already installed
+    if command -v op &> /dev/null; then
+        echo "1Password CLI is already installed, skipping..."
+    else
+        echo "=== Installing 1Password CLI ==="
+        curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+          sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg && \
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+          sudo tee /etc/apt/sources.list.d/1password.list && \
+          sudo mkdir -p /etc/debsig/policies/AC2D62742012EA22/ && \
+          curl -sS https://downloads.1password.com/linux/debian/debsig/1password.pol | \
+          sudo tee /etc/debsig/policies/AC2D62742012EA22/1password.pol && \
+          sudo mkdir -p /usr/share/debsig/keyrings/AC2D62742012EA22 && \
+          curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+          sudo gpg --dearmor --output /usr/share/debsig/keyrings/AC2D62742012EA22/debsig.gpg && \
+          sudo apt update && sudo apt install -y 1password-cli
     fi
 
     if [ $extras == true ]; then
@@ -78,12 +91,24 @@ if [ $machine == "Linux" ]; then
 # Installing on mac with homebrew
 elif [ $machine == "Mac" ]; then
     brew install coreutils ncdu htop ncdu rsync btop jq || true  # Mac won't have realpath before coreutils installed
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Install uv if not already installed
+    if [ -x ~/.local/bin/uv ] || command -v uv &> /dev/null; then
+        echo "uv is already installed, skipping..."
+    else
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+    fi
     # Install Claude Code if not already installed
     if [ -x ~/.local/bin/claude ] || [ -d ~/.local/share/claude ]; then
         echo "Claude Code is already installed, skipping..."
     else
         curl -fsSL https://claude.ai/install.sh | bash
+    fi
+    # Install 1Password CLI if not already installed
+    if command -v op &> /dev/null; then
+        echo "1Password CLI is already installed, skipping..."
+    else
+        echo "=== Installing 1Password CLI ==="
+        brew install 1password-cli || true
     fi
 
     if [ $extras == true ]; then
@@ -96,8 +121,7 @@ elif [ $machine == "Mac" ]; then
     fi
 
     DOT_DIR=$(dirname $(realpath $0))
-    [ $zsh == true ] && brew install zsh || true
-    [ $tmux == true ] && brew install tmux || true
+    brew install zsh tmux || true
     # macOS system preferences removed - user preference
     # defaults write -g InitialKeyRepeat -int 10 # normal minimum is 15 (225 ms)
     # defaults write -g KeyRepeat -int 1 # normal minimum is 2 (30 ms)
